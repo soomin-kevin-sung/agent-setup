@@ -1,0 +1,8 @@
+{
+  "name": "plugin-template",
+  "version": "0.1.0",
+  "description": "Template for an agent plugin.",
+  "skills": [],
+  "mcpServers": {},
+  "apps": []
+}
