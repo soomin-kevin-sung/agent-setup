@@ -1,8 +1,12 @@
 # agent-setup
 
-Codex, Claude 같은 에이전트 서비스를 사용할 때 필요한 설정 파일, 지침 파일, 플러그인, 스킬, 프롬프트 조각을 한곳에서 관리하기 위한 저장소입니다.
+Codex, Claude 같은 에이전트 서비스를 여러 PC와 여러 프로젝트에서 일관되게 사용하기 위한 에이전트 환경 설정 저장소입니다.
 
-이 저장소는 특정 프로젝트에 바로 복사해서 사용할 수 있는 `AGENTS.md`, `CLAUDE.md` 같은 에이전트별 지침 파일과, 여러 프로젝트에서 재사용할 수 있는 공통 규칙, 스킬, 플러그인 템플릿을 보관합니다.
+이 저장소는 세 가지를 분리해서 관리합니다.
+
+- 대상 프로젝트에 복사할 에이전트 지침 파일
+- 현재 PC와 다른 PC에 적용할 에이전트 환경 프로필
+- 직접 관리하는 스킬, 플러그인, 프롬프트, 자동화 스크립트
 
 ## 폴더 구조
 
@@ -18,8 +22,25 @@ agent-setup/
 │  │  └─ CLAUDE.md
 │  └─ shared/
 │     └─ common.md
-├─ docs/
-│  └─ structure.md
+├─ profiles/
+│  ├─ README.md
+│  └─ codex/
+│     ├─ README.md
+│     ├─ manifest.json
+│     ├─ config/
+│     │  └─ .gitkeep
+│     ├─ skills/
+│     │  └─ .gitkeep
+│     └─ plugins/
+│        └─ .gitkeep
+├─ skills/
+│  ├─ README.md
+│  ├─ agent-setup-sync/
+│  │  ├─ SKILL.md
+│  │  └─ agents/
+│  │     └─ openai.yaml
+│  └─ _template/
+│     └─ SKILL.md
 ├─ plugins/
 │  ├─ README.md
 │  └─ _template/
@@ -29,23 +50,48 @@ agent-setup/
 ├─ prompts/
 │  └─ README.md
 ├─ scripts/
-│  └─ README.md
-└─ skills/
-   ├─ README.md
-   └─ _template/
-      └─ SKILL.md
+│  ├─ README.md
+│  ├─ apply-codex-profile.ps1
+│  ├─ playwright-edge.ps1
+│  └─ sync-codex-profile.ps1
+└─ docs/
+   ├─ agent-setup-protocol.md
+   ├─ codex-sync.md
+   └─ structure.md
 ```
 
-## 사용 방식
+## 핵심 개념
 
-1. `agent-files/shared/common.md`에 모든 에이전트가 공유할 기본 원칙을 작성합니다.
-2. `agent-files/codex/AGENTS.md`, `agent-files/claude/CLAUDE.md`에 서비스별 차이를 반영합니다.
-3. 프로젝트별로 필요한 파일만 복사하거나, 스크립트를 추가해 자동 배포합니다.
-4. 반복해서 쓰는 기능은 `skills/`, 도구 묶음은 `plugins/`, 재사용 프롬프트는 `prompts/`에 보관합니다.
+`agent-files/`는 다른 프로젝트에 복사할 지침 파일의 원본입니다.
+
+`profiles/`는 PC에 적용할 에이전트 실행 환경입니다. 예를 들어 `profiles/codex/skills/`는 다른 PC의 `~/.codex/skills`로 적용됩니다.
+
+`skills/`와 `plugins/`는 이 저장소가 직접 관리하는 로컬 소스와 템플릿입니다. 외부에서 설치된 스킬의 적용본은 `profiles/codex/skills/`에 들어갑니다.
+
+`scripts/`는 프로필 동기화와 적용을 수행하는 자동화 계층입니다.
+
+초기 상태의 `profiles/codex/`는 비어 있습니다. 실제 스킬, 플러그인, 설정을 프로필에 반영하려면 `sync-codex-profile.ps1`을 실행합니다.
+
+## 사용 흐름
+
+현재 PC의 Codex 환경을 저장소 프로필에 반영:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\sync-codex-profile.ps1
+```
+
+다른 PC에 저장소 프로필 적용:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\apply-codex-profile.ps1
+```
+
+적용 후 Codex를 재시작합니다.
 
 ## 관리 원칙
 
-- 공통 규칙은 한곳에 두고, 에이전트별 파일에는 서비스 차이만 적습니다.
-- 실제 프로젝트에 배포 가능한 파일과 템플릿은 분리합니다.
-- 개인 비밀값, API 키, 토큰은 저장소에 커밋하지 않습니다.
-- 파일명은 각 서비스가 인식하는 표준 이름을 유지합니다.
+- `profiles/codex/manifest.json`을 Codex 프로필의 단일 인벤토리로 사용합니다.
+- `manifest.json`에는 `agent`, `schemaVersion`, 제외 규칙, 플러그인 목록, 독립 스킬과 플러그인 제공 스킬의 관계를 기록합니다.
+- timestamp처럼 매번 바뀌는 값은 manifest에 넣지 않습니다.
+- 인증 정보, 세션, 로그, 캐시, SQLite 상태 파일은 저장소에 포함하지 않습니다.
+- `skills/`는 로컬 스킬 원본, `profiles/codex/skills/`는 적용 가능한 설치 프로필입니다.

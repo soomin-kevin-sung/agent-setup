@@ -1,0 +1,23 @@
+{
+  "agent": "codex",
+  "schemaVersion": 1,
+  "excluded": [
+    "auth.json",
+    "sessions/",
+    "history.jsonl",
+    "*.sqlite",
+    "*.sqlite-shm",
+    "*.sqlite-wal",
+    "log/",
+    "tmp/",
+    ".tmp/",
+    "plugins/cache/",
+    "skills/.system/",
+    "skills/codex-primary-runtime/"
+  ],
+  "plugins": [],
+  "skills": {
+    "standalone": [],
+    "fromPlugins": []
+  }
+}

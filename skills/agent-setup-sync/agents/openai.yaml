@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Setup Sync"
+  short_description: "Sync and apply Codex environment profiles across PCs."
+  default_prompt: "Use $agent-setup-sync to sync my current Codex environment into this agent-setup repository."

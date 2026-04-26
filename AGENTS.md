@@ -1,19 +1,23 @@
 # AGENTS.md
 
-이 저장소는 Codex, Claude 등 에이전트 서비스에서 사용하는 설정 파일과 확장 구성을 관리합니다.
+이 저장소는 Codex, Claude 같은 에이전트 서비스에서 사용하는 지침 파일, 스킬, 플러그인, 실행 환경 프로필을 관리합니다.
 
 ## 작업 원칙
 
-- 저장소의 목적은 에이전트별 지침 파일, 공통 규칙, 스킬, 플러그인, 프롬프트 자산을 체계적으로 보관하는 것입니다.
-- 실제 프로젝트에 복사해서 쓸 원본 파일은 `agent-files/` 아래에 둡니다.
-- 서비스와 무관한 공통 규칙은 `agent-files/shared/common.md`에 먼저 정리합니다.
-- Codex 전용 지침은 `agent-files/codex/AGENTS.md`에 작성합니다.
-- Claude 전용 지침은 `agent-files/claude/CLAUDE.md`에 작성합니다.
-- 스킬은 `skills/`, 플러그인은 `plugins/`, 재사용 프롬프트는 `prompts/`에 둡니다.
-- 비밀값, 토큰, API 키, 개인 인증 정보는 저장소에 남기지 않습니다.
+- 이 저장소의 목적은 에이전트 환경을 여러 PC와 프로젝트에서 재현 가능하게 만드는 것입니다.
+- 대상 프로젝트에 복사할 지침 파일은 `agent-files/`에 둡니다.
+- PC에 적용할 에이전트 실행 환경은 `profiles/`에 둡니다.
+- 이 저장소가 직접 관리하는 로컬 스킬 원본은 `skills/`에 둡니다.
+- 이 저장소가 직접 관리하는 로컬 플러그인 원본은 `plugins/`에 둡니다.
+- 자동화 스크립트는 `scripts/`에 둡니다.
+- 비밀값, 토큰, API 키, 인증 파일, 세션, 로그, 캐시는 저장소에 포함하지 않습니다.
 
-## 편집 기준
+## 구조 기준
 
-- 새로운 에이전트 서비스를 추가할 때는 `agent-files/<service-name>/` 디렉터리를 만들고 해당 서비스의 표준 지침 파일명을 사용합니다.
-- 템플릿은 `_template/` 디렉터리에 두고, 실제 사용하는 파일과 구분합니다.
-- 문서나 구조를 바꿀 때는 `README.md`와 `docs/structure.md`도 함께 갱신합니다.
+- `profiles/codex/manifest.json`을 Codex 프로필의 단일 인벤토리로 사용합니다.
+- `manifest.json`에는 `agent`, `schemaVersion`, 제외 규칙, 플러그인 목록, 독립 스킬과 플러그인 제공 스킬 관계를 기록합니다.
+- timestamp처럼 매번 바뀌는 값은 manifest에 넣지 않습니다.
+- `skills/`는 로컬 스킬 소스입니다.
+- `profiles/codex/skills/`는 실제 적용 가능한 Codex 스킬 프로필입니다.
+- 초기 커밋에서는 `profiles/codex/`를 빈 프로필로 유지하고 `.gitkeep`만 둡니다.
+- 구조를 바꿀 때는 `README.md`와 `docs/structure.md`를 함께 갱신합니다.
